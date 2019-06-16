@@ -27,18 +27,15 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-public class Client{
+public class cli1{
 
-    private String idString = "cli0";
+    private String idString = "cli1";
     private String Receive = "0client";
     private String record_send_message;//记录自己发送的信息
     private String record_receive_message;//记录自己收到的信息
+    private int secret[] = {7,-8,9,-5,6,-1};//一次是mix0,mix1,mix2,client0,client1,mix3
     public Vector path = new Vector();
-    public  String idStrings[] = {"mix0", "mix1", "mix2", "cli0", "cli1","mix3" ,
-            "mix4", "mix5", "mix6","mix7"};
-    private int secret[] = {7, -8, 9, -5, 6, -1, -4, 5, -6,2};//一次是mix0,mix1,mix2,client0,client1,mix3,mix4,mix5,mix6
-
-
+    public  String idStrings[] = {"mix0", "mix1", "mix2", "cli0", "cli1","mix3","mix4","mix5","mix6","mix7"};
     //UI声明段
     private JFrame frame;
     private JList userList;
@@ -70,18 +67,18 @@ public class Client{
 
     // 主方法,程序入口
     public static void main(String[] args) {
-        new Client();
+        new cli1();
     }
 
     // 构造方法
-    public Client() {
+    public cli1() {
         // 成员变量
         textArea = new JTextArea();
         textArea.setEditable(false);
         textField = new JTextField();
         lb_port = new JLabel("8080");
         lb_hostIp = new JLabel("127.0.0.1");
-        lb_name = new JLabel("cli0");
+        lb_name = new JLabel("cli1");
         btn_start = new JButton("连接");
         btn_stop = new JButton("断开");
         btn_send = new JButton("发送");
@@ -108,7 +105,7 @@ public class Client{
         rightScroll.setBorder(new TitledBorder("消息显示区"));
 
         leftScroll = new JScrollPane(userList);
-        leftScroll.setBorder(new TitledBorder("在线用户区"));
+        leftScroll.setBorder(new TitledBorder("节点群"));
 
         southPanel = new JPanel(new BorderLayout());
         southPanel.add(textField, "Center");
@@ -119,7 +116,7 @@ public class Client{
                 rightScroll);
         centerSplit.setDividerLocation(100);
 
-        frame = new JFrame("cli0");
+        frame = new JFrame("cli1");
         frame.setLayout(new BorderLayout());
         frame.add(northPanel, "North");
         frame.add(centerSplit, "Center");
@@ -218,20 +215,8 @@ public class Client{
 
     // 执行发送
     public void send() {
-        path.clear();
         Vector len4_messages = new Vector();
         String message = textField.getText();
-
-        Scanner messages=new Scanner(System.in);//得到传输的messages
-        System.out.println("请输入传输路线经过的节点数：");
-        int n = messages.nextInt();
-
-        System.out.println("请输入path(0,1,2,3,4,5,6,7,8,9)" +
-                "--分别表示0mix0,1mix1,2mix2,3client0,4client1,5mix3,6mix4,7mix5,8mix6,9mix7 ：");
-        for(int i = 0; i < n; i++){
-            path.add(messages.nextInt());
-        }
-        messages.nextLine();
 
         if(userList.isSelectionEmpty()){
             String message1= "all";
@@ -241,6 +226,9 @@ public class Client{
         }else{
             String message1 = (String) userList.getSelectedValue();
             textArea.append(frame.getTitle()+":"+message+"\r\n");
+            //得到路径信息
+            int n = getMixNumber();
+            getPath(n,path);
 
             len4_messages = messageProcess(n,message);
             for(int i = 0;i < len4_messages.size(); i++){
@@ -312,8 +300,7 @@ public class Client{
 
         //去除填充位
         public String receiveProcess(String message){
-            message = message.substring(0,message.length()-4);
-            message = EncryptUncrypt.uncrypt(message,5);
+            //message = message.substring(0,message.length()-4);
             if(message.startsWith("000"))
             {
                 message = message.substring(3);
@@ -374,6 +361,7 @@ public class Client{
                         }
                     }  else {// 普通消息
                         receiveProcess(message);//填充位的去除
+                        //message = "cli0: " + message.substring(message.length()-4,message.length());
                         textArea.append(message + "\r\n");
 
                     }
@@ -385,6 +373,8 @@ public class Client{
             }
         }
     }
+
+
 
     //信息处理
     public Vector messageProcess(int n, String s){
@@ -411,21 +401,17 @@ public class Client{
                 }
                 s = supplement.concat(s);
             }
+
         }
         for(int i = 0; i < num_package; i++)
         {
             len4_message = s.substring(4*i,4*i+4);
             for(int j = n;j > 0;j--) {
-                if(j == 1){
-                    len4_message = "cli0" + EncryptUncrypt.encrypt(
-                            len4_message, secret[(int) path.get(j-1)])
-                            + idStrings[(int)path.get(j-1)];
-                }else {
-                    len4_message = idStrings[(int) path.get(j-2)] + EncryptUncrypt.encrypt(
-                            len4_message, secret[(int) path.get(j - 1)])
-                            + idStrings[(int) path.get(j - 1)];
-                }
+                len4_message =EncryptUncrypt.encrypt(
+                        len4_message, secret[(int) path.get(j-1)])
+                        + idStrings[(int)path.get(j-1)];
             }
+
             len4_messages.add(len4_message);
             path.clear();
         }
@@ -452,6 +438,4 @@ public class Client{
     }
 
 }
-
-
 

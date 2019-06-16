@@ -4,9 +4,9 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 //恶意节点
-public class mix3 {
-    String idString = "mix3";
-    int secret = -1;
+public class mix7 {
+    String idString = "mix7";
+    int secret = 2;
 
     public void init() throws IOException {
         try {
@@ -25,7 +25,7 @@ public class mix3 {
     }
 
     public static void main(String[] args) throws Exception {
-        new mix3().init();
+        new mix7().init();
     }
 
     class RecieverThread implements Runnable{

@@ -1,16 +1,22 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-//恶意节点
-public class mix3 {
-    String idString = "mix3";
-    int secret = -1;
+public class mix1 {
+    private String idString = "mix1";
+    int secret = -8;
 
     public void init() throws IOException {
         try {
             Socket socket = new Socket("127.0.0.1", 8080);
+
+
             new Thread(new RecieverThread(socket)).start();
             new Thread(new SendMessage(socket)).start();
         } catch (UnknownHostException e) {
@@ -25,18 +31,20 @@ public class mix3 {
     }
 
     public static void main(String[] args) throws Exception {
-        new mix3().init();
+        new mix1().init();
     }
 
-    class RecieverThread implements Runnable{
+    class RecieverThread implements Runnable {
         private Socket socket;
-        public RecieverThread(Socket socket){
-            this.socket=socket;
+
+        public RecieverThread(Socket socket) {
+            this.socket = socket;
         }
+
         @Override
         public void run() {
             try {
-                while(true){
+                while (true) {
                     BufferedReader in= new BufferedReader(new InputStreamReader(
                             socket.getInputStream(),"utf-8"));
                     String s=in.readLine();
@@ -45,10 +53,10 @@ public class mix3 {
                     System.out.println(s);
                     s = EncryptUncrypt.uncrypt(s,secret);
                     System.out.println(s);
-                    //PrintWriter out =new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                    //       socket.getOutputStream(),"utf-8")));
-                    //out.write(s+"\n");
-                    //out.flush();
+                    PrintWriter out =new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                            socket.getOutputStream(),"utf-8")));
+                    out.write(s+"\n");
+                    out.flush();
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -58,22 +66,25 @@ public class mix3 {
         }
     }
 
-    class SendMessage implements Runnable{
+    class SendMessage implements Runnable {
         private Socket socket;
-        public SendMessage(Socket socket){
-            this.socket=socket;
+
+        public SendMessage(Socket socket) {
+            this.socket = socket;
         }
+
         @Override
         public void run() {
             try {
-                PrintWriter out =new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                        socket.getOutputStream(),"utf-8")));
+                PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                        socket.getOutputStream(), "utf-8")));
                 out.println(idString+"@" + socket.getLocalAddress().toString());
                 out.flush();
-                Scanner sc=new Scanner(System.in);
-                while(true){
-                    String s=sc.nextLine();
-                    out.write(s+"\n");
+                Scanner sc = new Scanner(System.in);
+
+                while (true) {
+                    String s = sc.nextLine();
+                    out.write(s + "\n");
                     out.flush();
                 }
             } catch (IOException e) {

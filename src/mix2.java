@@ -3,10 +3,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-//恶意节点
-public class mix3 {
-    String idString = "mix3";
-    int secret = -1;
+public class mix2 {
+    String idString = "mix2";
+    int secret = 9;
 
     public void init() throws IOException {
         try {
@@ -25,7 +24,7 @@ public class mix3 {
     }
 
     public static void main(String[] args) throws Exception {
-        new mix3().init();
+        new mix2().init();
     }
 
     class RecieverThread implements Runnable{
@@ -45,10 +44,10 @@ public class mix3 {
                     System.out.println(s);
                     s = EncryptUncrypt.uncrypt(s,secret);
                     System.out.println(s);
-                    //PrintWriter out =new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                    //       socket.getOutputStream(),"utf-8")));
-                    //out.write(s+"\n");
-                    //out.flush();
+                    PrintWriter out =new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                            socket.getOutputStream(),"utf-8")));
+                    out.write(s+"\n");
+                    out.flush();
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
